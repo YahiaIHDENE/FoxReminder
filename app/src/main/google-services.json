@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "712006264216",
+    "firebase_url": "https://pouloulou-reminder.firebaseio.com",
+    "project_id": "pouloulou-reminder",
+    "storage_bucket": "pouloulou-reminder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712006264216:android:e0d222500e1b77bdcf37ed",
+        "android_client_info": {
+          "package_name": "m.incrementrestservice.poulouloureminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "712006264216-3rblbple1nuebgf4loib4rf20srna66m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbk7ZXN2PDasHTNU1sGwndy39fLEV_Tro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "712006264216-3rblbple1nuebgf4loib4rf20srna66m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -129,7 +129,7 @@
 
 
     <ImageButton
-        android:id="@+id/editadress"
+        android:id="@+id/editadress1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/date_Rdv"

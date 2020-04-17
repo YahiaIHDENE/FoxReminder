@@ -29,7 +29,6 @@ import m.incrementrestservice.poulouloureminder.RdvActivity;
 import m.incrementrestservice.poulouloureminder.model.User;
 
 import static android.content.Context.MODE_PRIVATE;
-import static m.incrementrestservice.poulouloureminder.RdvActivity.mypref;
 
 public class participantAdapter extends RecyclerView.Adapter<participantAdapter.ViewHolder>{
 

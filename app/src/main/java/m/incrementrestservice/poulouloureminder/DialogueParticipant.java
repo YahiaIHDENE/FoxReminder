@@ -36,7 +36,6 @@ import m.incrementrestservice.poulouloureminder.adapter.participantAdapter;
 import m.incrementrestservice.poulouloureminder.adapter.userAdapter;
 import m.incrementrestservice.poulouloureminder.model.User;
 
-import static m.incrementrestservice.poulouloureminder.RdvActivity.mypref;
 
 
 public class DialogueParticipant extends AppCompatDialogFragment {

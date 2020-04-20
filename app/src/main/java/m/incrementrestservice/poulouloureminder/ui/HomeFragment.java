@@ -7,17 +7,12 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,16 +26,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import m.incrementrestservice.poulouloureminder.NewNoteActivity;
 import m.incrementrestservice.poulouloureminder.NewRdvActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.adapter.RdvAdapter;
-import m.incrementrestservice.poulouloureminder.adapter.RdvAdapter;
-import m.incrementrestservice.poulouloureminder.model.Rdv;
 import m.incrementrestservice.poulouloureminder.model.Rdv;
 
 public class HomeFragment extends Fragment {
@@ -60,7 +51,6 @@ public class HomeFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         btn_add = view.findViewById(R.id.addrdvitem);
-
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,12 +105,11 @@ public class HomeFragment extends Fragment {
                 mRdv.clear();
 
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                    Rdv notes = snapshot.getValue(Rdv.class);
-                    assert notes != null;
+                    Rdv rdv = snapshot.getValue(Rdv.class);
+                    assert rdv != null;
                     assert fUser != null;
-                    if (fUser.getUid().equals(notes.owner)) {
-                        mRdv.add(notes);
+                    if (fUser.getUid().equals(rdv.owner)) {
+                        mRdv.add(rdv);
                     }
                 }
 
@@ -149,13 +138,14 @@ public class HomeFragment extends Fragment {
                 if (searchRdv.getText().toString().equals("")){
                     mRdv.clear();
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-
                         Rdv rdv = snapshot.getValue(Rdv.class);
+                        //HashMap <String, Rdv> hashMap = new HashMap<>();
+                        //hashMap.values()=snapshot.getValue(Rdv.class);
                         assert rdv!= null;
                         assert firebaseUser!= null;
-                        if(firebaseUser.getUid().equals(rdv.owner)){
+                        /*if(firebaseUser.getUid().equals(rdv.owner)){
                             mRdv.add(rdv);
-                        }
+                        }*/
                          for (Map.Entry mapentry : rdv.particip.entrySet()) {
                                 if(firebaseUser.getUid().equals(mapentry.getValue())){
                                     mRdv.add(rdv);
@@ -170,8 +160,6 @@ public class HomeFragment extends Fragment {
                     rdvAdapter = new RdvAdapter(getContext(),mRdv);
                     recyclerView_Rdv.setAdapter(rdvAdapter);
                     progressBar.setVisibility(View.GONE);
-
-
                 }
 
             }
@@ -183,9 +171,6 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
-
-
 
 }
 

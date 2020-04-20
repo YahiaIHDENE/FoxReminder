@@ -1,10 +1,5 @@
 package m.incrementrestservice.poulouloureminder;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -12,13 +7,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -38,7 +37,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import m.incrementrestservice.poulouloureminder.adapter.participantAdapter;
 import m.incrementrestservice.poulouloureminder.model.Rdv;
 import m.incrementrestservice.poulouloureminder.notifications.APIService;
 import m.incrementrestservice.poulouloureminder.notifications.Client;
@@ -47,7 +45,6 @@ import m.incrementrestservice.poulouloureminder.notifications.MyResponse;
 import m.incrementrestservice.poulouloureminder.notifications.Sender;
 import m.incrementrestservice.poulouloureminder.notifications.Token;
 import m.incrementrestservice.poulouloureminder.ui.DatePickerFragment;
-import m.incrementrestservice.poulouloureminder.ui.HomeFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -65,7 +62,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
     ImageButton addRdv;
     ImageButton setadress;
     ProgressBar progressBar;
-    List<String> listP;
+    HashMap<String, String> hashMapp;
     APIService apiService;
 
     private  static final String TAG = "NewRdvActivity";
@@ -106,7 +103,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
         shar_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OpenDialogue();
+                OpenDialogue(hashMapp);
             }
         });
 
@@ -145,20 +142,22 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
                     return;
                 }
                 if (!TextUtils.isEmpty(date1) && !TextUtils.isEmpty(titre) && !TextUtils.isEmpty(textRdv)) {
+
                     progressBar.setVisibility(View.VISIBLE);
+
                     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                     long time = System.currentTimeMillis();
                     String idRdv =String.valueOf(time)+"-"+firebaseUser.getUid();
                     HashMap<String, String> hashMap = new HashMap<>();
-                    if (listP!=null) {
+                    if (hashMapp!=null) {
 
-                        for (int i=0;i<listP.size();i++){
-                            hashMap.put("id_invit_"+(i+1), listP.get(i));
-                        }
+                        hashMap = hashMapp;
+
                     }else{
-                        hashMap.put("id_invit_0", "default");
+                        hashMap.put("id_invit_0", firebaseUser.getUid());
 
                     }
+
 
                     final DatabaseReference databaseRdv = FirebaseDatabase.getInstance().getReference("Rdv");
                     final Rdv rdv = new Rdv(titre, date1, textRdv,firebaseUser.getUid(),titre.toLowerCase(),idRdv,adress1,hashMap);
@@ -169,7 +168,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
                             progressBar.setVisibility(GONE);
 
                             if (task.isSuccessful()) {
-                                sendNotification(listP, "username", titre );
+                                //sendNotification(hashMapp, "username", titre );
                                 Toast.makeText(NewRdvActivity.this, "Appointment addes.",Toast.LENGTH_LONG).show();
                             }else{
                                 Toast.makeText(NewRdvActivity.this, task.getException().getMessage(),Toast.LENGTH_LONG).show();
@@ -187,8 +186,8 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
 
     }
 
-    private void OpenDialogue() {
-        DialogueParticipant dialogueParticipant = new DialogueParticipant();
+    private void OpenDialogue(HashMap<String, String> hashMap) {
+        DialogueParticipant dialogueParticipant = new DialogueParticipant(hashMap);
         dialogueParticipant.show(getSupportFragmentManager(), "Participator dialogue ");
     }
 
@@ -204,8 +203,8 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
     }
 
     @Override
-    public void ApplyAdds(List<String> list) {
-        listP = list;
+    public void ApplyAdds(HashMap<String, String> hashMap) {
+        hashMapp = hashMap;
     }
 
 

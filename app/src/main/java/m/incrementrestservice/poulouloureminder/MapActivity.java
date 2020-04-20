@@ -12,7 +12,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +39,13 @@ import com.google.firebase.database.annotations.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import m.incrementrestservice.poulouloureminder.adapter.PlaceAutoSuggestAdapter;
+import m.incrementrestservice.poulouloureminder.model.PlaceInfo;
+
+/**
+ * Created by User on 10/2/2017.
+ */
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -66,25 +75,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private static final int PLACE_PICKER_REQUEST = 1;
     private static final float DEFAULT_ZOOM = 15f;
 
     //widgets
-    public EditText mSearchText = null;
-    private ImageView mGps;
-
+    private AutoCompleteTextView mSearchText;
+    private ImageView mGps,mPlacePicker;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
+    private PlaceInfo mPlace;
+    private Marker mMarker;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        mSearchText = findViewById(R.id.input_search);
+        //mSearchText =  findViewById(R.id.input_search);
         mGps = findViewById(R.id.ic_gps);
-
+        mPlacePicker = (ImageView) findViewById(R.id.place_picker);
+        mSearchText=findViewById(R.id.input_search);
+        mSearchText.setAdapter(new PlaceAutoSuggestAdapter(MapActivity.this,android.R.layout.simple_list_item_1));
 
         getLocationPermission();
 
@@ -92,7 +105,32 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void init(){
         Log.d(TAG, "init: initializing");
+        mSearchText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Address : ",mSearchText.getText().toString());
+                LatLng latLng=getLatLngFromAddress(mSearchText.getText().toString());
+                if(latLng!=null) {
+                    Log.d("Lat Lng : ", " " + latLng.latitude + " " + latLng.longitude);
+                    Address address=getAddressFromLatLng(latLng);
+                    if(address!=null) {
+                        Log.d("Address : ", "" + address.toString());
+                        Log.d("Address Line : ",""+address.getAddressLine(0));
+                        Log.d("Phone : ",""+address.getPhone());
+                        Log.d("Pin Code : ",""+address.getPostalCode());
+                        Log.d("Feature : ",""+address.getFeatureName());
+                        Log.d("More : ",""+address.getLocality());
+                    }
+                    else {
+                        Log.d("Adddress","Address Not Found");
+                    }
+                }
+                else {
+                    Log.d("Lat Lng","Lat Lng Not Found");
+                }
 
+            }
+        });
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -102,51 +140,46 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
 
                     //execute our method for searching
-                    System.out.println("+++++++++++++++ mSearchText +++++++++++++++++");
-                    String search = mSearchText.getText().toString().trim();
-                    geoLocate(search);
+                    geoLocate();
                 }
-
-                mGps.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Log.d(TAG, "onClick: clicked gps icon");
-                        getDeviceLocation();
-                    }
-                });
-
-                hideSoftKeyboard();
 
                 return false;
             }
         });
+
+        mGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: clicked gps icon");
+                getDeviceLocation();
+            }
+        });
+
+        hideSoftKeyboard();
     }
 
-    private void geoLocate(String searchString){
+    private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
 
-        Geocoder geocoder = new Geocoder(MapActivity.this);
-        System.out.println("+++++++++++++++ geolocate +++++++++++++++++");
+        String searchString = mSearchText.getText().toString();
 
+        Geocoder geocoder = new Geocoder(MapActivity.this);
         List<Address> list = new ArrayList<>();
         try{
             list = geocoder.getFromLocationName(searchString, 1);
-            System.out.println("+++++++++++++++ geolocate try +++++++++++++++++");
-
         }catch (IOException e){
             Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
         }
 
         if(list.size() > 0){
             Address address = list.get(0);
-            System.out.println("+++++++++++++++ result +++++++++++++++++");
-
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
 
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
                     address.getAddressLine(0));
+
         }
     }
 
@@ -166,11 +199,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
-                            if(currentLocation!=null){
-
-                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                        DEFAULT_ZOOM, "My location");
-                            }
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                    DEFAULT_ZOOM,
+                                    "My Location");
 
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
@@ -184,6 +215,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo){
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
+        mMap.clear();
+
+        if(placeInfo != null){
+            try{
+                String snippet = "Address: " + placeInfo.getAddress() + "\n" +
+                        "Phone Number: " + placeInfo.getPhoneNumber() + "\n" +
+                        "Website: " + placeInfo.getWebsiteUri() + "\n" +
+                        "Price Rating: " + placeInfo.getRating() + "\n";
+
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title(placeInfo.getName())
+                        .snippet(snippet);
+                mMarker = mMap.addMarker(options);
+
+            }catch (NullPointerException e){
+                Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage() );
+            }
+        }else{
+            mMap.addMarker(new MarkerOptions().position(latLng));
+        }
+
+        hideSoftKeyboard();
+    }
     private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -194,6 +253,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .title(title);
             mMap.addMarker(options);
         }
+
+        hideSoftKeyboard();
     }
 
     private void initMap(){
@@ -253,6 +314,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void hideSoftKeyboard(){
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
+
+
+    //========================================================================//
+    private LatLng getLatLngFromAddress(String address){
+
+        Geocoder geocoder=new Geocoder(MapActivity.this);
+        List<Address> addressList;
+
+        try {
+            addressList = geocoder.getFromLocationName(address, 7);
+            if(addressList!=null){
+                Address singleaddress=addressList.get(0);
+                LatLng latLng=new LatLng(singleaddress.getLatitude(),singleaddress.getLongitude());
+                return latLng;
+            }
+            else{
+                return null;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    private Address getAddressFromLatLng(LatLng latLng){
+        Geocoder geocoder=new Geocoder(MapActivity.this);
+        List<Address> addresses;
+        try {
+            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 7);
+            if(addresses!=null){
+                Address address=addresses.get(0);
+                return address;
+            }
+            else{
+                return null;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    //========================================================================//
+
+
 
 
 }

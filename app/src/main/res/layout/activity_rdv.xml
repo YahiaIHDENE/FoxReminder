@@ -52,20 +52,29 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
+    <ImageButton
+        android:id="@+id/added_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_added"
+        android:layout_below="@+id/barlayout"
+        android:visibility="visible"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+<!--
     <ImageButton
         android:id="@+id/shar_btn1"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_participants"
         android:layout_below="@+id/barlayout"
+        android:layout_alignLeft="@+id/added_btn"
+        android:layout_marginLeft="55dp"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"/>
-
+        android:src="@drawable/ic_participants"
+        android:visibility="visible" />
+!-->
     <EditText
         android:id="@+id/Title_Rdv2"
         android:layout_width="wrap_content"
@@ -135,7 +144,7 @@
         android:layout_marginTop="25dp"
         android:layout_toEndOf="@+id/adress_Rdv1"
         android:layout_toRightOf="@+id/adress_Rdv1"
-        android:src="@drawable/ic_location" />
+        android:src="@drawable/ic_edit_location" />
 
     <EditText
         android:id="@+id/Rdvtext"

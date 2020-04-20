@@ -1,11 +1,5 @@
 package m.incrementrestservice.poulouloureminder;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.navigation.NavigationView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,8 +37,6 @@ import m.incrementrestservice.poulouloureminder.notifications.Data;
 import m.incrementrestservice.poulouloureminder.notifications.MyResponse;
 import m.incrementrestservice.poulouloureminder.notifications.Sender;
 import m.incrementrestservice.poulouloureminder.notifications.Token;
-import m.incrementrestservice.poulouloureminder.ui.HomeFragment;
-import m.incrementrestservice.poulouloureminder.ui.SendFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,7 +49,6 @@ public class MessageActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     DatabaseReference mDatabase;
-
 
     ImageButton btn_send;
     EditText textSend;
@@ -69,7 +65,6 @@ public class MessageActivity extends AppCompatActivity {
     boolean notify = false;
 
     APIService apiService;
-
 
 
     @Override

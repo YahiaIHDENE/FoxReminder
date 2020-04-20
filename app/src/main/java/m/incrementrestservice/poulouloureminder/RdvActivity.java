@@ -1,16 +1,8 @@
 package m.incrementrestservice.poulouloureminder;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
-
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +13,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,23 +28,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import m.incrementrestservice.poulouloureminder.model.Rdv;
 import m.incrementrestservice.poulouloureminder.ui.DatePickerFragment;
 
-public class RdvActivity extends AppCompatActivity   implements DialogueParticipant.DialogueParticipantInterface, DatePickerDialog.OnDateSetListener{
+import static android.view.View.GONE;
+
+public class RdvActivity extends AppCompatActivity implements DialogueParticipant.DialogueParticipantInterface, DatePickerDialog.OnDateSetListener{
 
     CircleImageView icone;
     TextView titleRdv2;
     TextView titleRdv;
-    ImageButton shar_btn;
+    //ImageButton shar_btn;
+    ImageButton added_shar ;
     TextView date ;
     ImageButton setdate;
     EditText adress_rdv ;
@@ -61,9 +59,8 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
 
     String rdvid;
     Intent intent;
-    List<String> listP;
-
-
+    HashMap<String, String> hashMap;
+    HashMap<String, String> hashMapp;
 
     ProgressBar progressBar;
 
@@ -71,7 +68,6 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rdv);
-
 
         Toolbar toolbar = findViewById(R.id.toolbarNote);
         setSupportActionBar(toolbar);
@@ -88,7 +84,7 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
         icone = findViewById(R.id.image_Rdv);
         titleRdv = findViewById(R.id.Title_Rdv);
         titleRdv2 = findViewById(R.id.Title_Rdv2);
-        shar_btn = findViewById(R.id.shar_btn1);
+        added_shar = findViewById(R.id.added_btn);
         date = findViewById(R.id.date_Rdv);
         adress_rdv = findViewById(R.id.adress_Rdv1);
         text =findViewById(R.id.Rdvtext);
@@ -110,10 +106,8 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
             }
         });
 
-
         intent= getIntent();
         rdvid = intent.getStringExtra("rdvid");
-
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -135,7 +129,7 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                     text.setText(rdvs.text);
                     text.setHint(rdvs.text);
 
-                    HashMap<String, String> hashMap = rdvs.particip;
+                     hashMap = rdvs.particip;
 
 
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(rdvs.owner);
@@ -159,10 +153,11 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                     int blue = random.nextInt(255);
                     icone.setBorderColor(Color.argb(255,red,green,blue));
 
-                    shar_btn.setOnClickListener(new View.OnClickListener() {
+                    added_shar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            OpenDialogue();
+                            OpenDialogue(hashMap);
+
                         }
                     });
 
@@ -172,8 +167,6 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                             delete_Rdv(rdvs);
                         }
                     });
-
-
 
                     setRdv.setOnClickListener(new View.OnClickListener() {
 
@@ -185,7 +178,6 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                     });
 
                 }
-
             }
 
             @Override
@@ -193,9 +185,6 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
 
             }
         });
-
-
-
 
     }
 
@@ -210,7 +199,6 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
         TextView date = findViewById(R.id.date_Rdv);
         date.setText(currentdateString);
     }
-
 
     public  void delete_Rdv(Rdv rdv){
         if (firebaseUser.getUid().equals(rdv.owner)){
@@ -227,7 +215,7 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                     progressBar.setVisibility(View.VISIBLE);
                     mDatabase.removeValue();
                     Toast.makeText(RdvActivity.this, "appointment "+titleRdv.getText().toString()+" deleted .",Toast.LENGTH_LONG).show();
-                    progressBar.setVisibility(View.GONE);
+                    progressBar.setVisibility(GONE);
                     onBackPressed();
 
                 }
@@ -275,10 +263,9 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                             String adress = adress_rdv.getText().toString().trim();
                             HashMap<String, String> hashMap1 = new HashMap<>();
 
-                            if (listP!=null) {
-                                for (int i=0;i<listP.size();i++){
-                                    hashMap1.put("id_invit_"+(i+1), listP.get(i));
-                                }
+                            if (hashMapp!=null) {
+
+                                hashMap = hashMapp;
                             }else{
                                 hashMap1.put("id_invit_0", "default");
 
@@ -296,7 +283,7 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
                             Toast.makeText(RdvActivity.this, "appointment "+titleRdv.getText().toString()+" updated .",Toast.LENGTH_LONG).show();
 
                             mDatabase.updateChildren(hashMap);
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(GONE);
 
 
 
@@ -332,13 +319,14 @@ public class RdvActivity extends AppCompatActivity   implements DialogueParticip
 
     }
 
-    private void OpenDialogue() {
-        DialogueParticipant dialogueParticipant = new DialogueParticipant();
+    private void OpenDialogue(HashMap<String, String> hashMap) {
+        DialogueParticipant dialogueParticipant = new DialogueParticipant(hashMap);
         dialogueParticipant.show(getSupportFragmentManager(), "Participator dialogue ");
     }
+
     @Override
-    public void ApplyAdds(List<String> list) {
-        listP = list;
+    public void ApplyAdds(HashMap<String, String> hashMap) {
+        hashMapp = hashMap;
     }
 
 

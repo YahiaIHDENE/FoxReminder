@@ -3,8 +3,6 @@ package m.incrementrestservice.poulouloureminder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,29 +28,29 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import m.incrementrestservice.poulouloureminder.adapter.participantAdapter;
-import m.incrementrestservice.poulouloureminder.adapter.userAdapter;
 import m.incrementrestservice.poulouloureminder.model.User;
-
-
 
 public class DialogueParticipant extends AppCompatDialogFragment {
 
+    public DialogueParticipant(HashMap<String, String> hashMap) {
+        this.hashMap = hashMap;
+    }
+
+    public DialogueParticipant() {
+    }
+
+    public  HashMap<String, String> hashMap;
     private RecyclerView recyclerView;
     private participantAdapter participantAdapter ;
     private List<User> mUser;
     private ProgressBar progressBar;
     EditText searchUsers;
     public  DialogueParticipantInterface listner;
-    public  List<String> listusers;
-
-    Intent intent;
-
-    public Intent getIntent() {
-        return intent;
-    }
+    public  HashMap<String,String> mapUsers;
 
     @NonNull
     @Override
@@ -64,9 +62,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
         recyclerView = view.findViewById(R.id.usersListD);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
-
+        final FirebaseUser firebaseUser =FirebaseAuth.getInstance().getCurrentUser();
 
         searchUsers =view.findViewById(R.id.search_barD);
         searchUsers.addTextChangedListener(new TextWatcher() {
@@ -90,27 +86,65 @@ public class DialogueParticipant extends AppCompatDialogFragment {
         mUser = new ArrayList<>();
         progressBar = view.findViewById(R.id.progressBarUsers);
         progressBar.setVisibility(View.VISIBLE);
+        String textDialouge ="";
         readUsers();
 
-        builder.setView(view)
-                .setTitle("Add participators")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        if (hashMap==null){
+            textDialouge = "Add";
+            builder.setView(view)
+                    .setTitle("Add participators")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                })
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
 
-                        listusers = participantAdapter.list;
-                        listner.ApplyAdds(listusers);
-                    }
+                    .setPositiveButton(textDialouge, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                });
+                            mapUsers = participantAdapter.hashMap;
+                            mapUsers.put("invite_0",firebaseUser.getUid());
+                            listner.ApplyAdds(mapUsers);
+                        }
 
+                    });
+        }else {
+            String id_owner = (String)hashMap.get("invite_0");
+            if (id_owner.equals(firebaseUser.getUid())){
+                textDialouge = "Edit";
+                builder.setView(view)
+                        .setTitle("Edit the list of participators")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
+                            }
+                        })
+
+                        .setPositiveButton(textDialouge, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                mapUsers = participantAdapter.hashMap;
+                                listner.ApplyAdds(mapUsers);
+                            }
+
+                        });
+            }else {
+                builder.setView(view)
+                        .setTitle("List of participators")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mapUsers = participantAdapter.hashMap;
+                                listner.ApplyAdds(mapUsers);
+                            }
+                        });
+            }
+
+        }
         return builder.create();
     }
 
@@ -120,9 +154,8 @@ public class DialogueParticipant extends AppCompatDialogFragment {
         listner = (DialogueParticipantInterface) context;
     }
 
-
     public interface DialogueParticipantInterface{
-        void ApplyAdds(List<String> list);
+        void ApplyAdds(HashMap<String,String> hashMap);
     }
 
     private void Search_users(String s) {
@@ -146,7 +179,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                     }
                 }
 
-                participantAdapter = new participantAdapter(getContext(),mUser);
+                participantAdapter = new participantAdapter(getContext(),mUser,hashMap);
                 recyclerView.setAdapter(participantAdapter);
                 progressBar.setVisibility(View.GONE);
 
@@ -163,7 +196,6 @@ public class DialogueParticipant extends AppCompatDialogFragment {
     private  void readUsers(){
 
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
 
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -174,26 +206,19 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                     mUser.clear();
 
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-
                         User user = snapshot.getValue(User.class);
                         assert user!= null;
                         assert firebaseUser!= null;
-                        if(!firebaseUser.getUid().equals(user.id_user)){
-
+                        if(!firebaseUser.getUid().equals(user.id_user)) {
                             mUser.add(user);
                         }
-
                     }
 
-                    participantAdapter = new participantAdapter(getContext(),mUser);
+                    participantAdapter = new participantAdapter(getContext(),mUser, hashMap);
                     recyclerView.setAdapter(participantAdapter);
                     progressBar.setVisibility(View.GONE);
-
-
                 }
-
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

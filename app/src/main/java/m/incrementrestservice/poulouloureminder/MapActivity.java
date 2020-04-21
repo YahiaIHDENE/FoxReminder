@@ -2,6 +2,7 @@ package m.incrementrestservice.poulouloureminder;
 
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +15,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +51,8 @@ import m.incrementrestservice.poulouloureminder.model.PlaceInfo;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+
+    public String address;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
@@ -78,9 +82,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int PLACE_PICKER_REQUEST = 1;
     private static final float DEFAULT_ZOOM = 15f;
 
+
     //widgets
-    private AutoCompleteTextView mSearchText;
+    public AutoCompleteTextView mSearchText;
     private ImageView mGps,mPlacePicker;
+    public  Button getAddess;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
@@ -88,6 +94,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PlaceInfo mPlace;
     private Marker mMarker;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,11 +104,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mGps = findViewById(R.id.ic_gps);
         mPlacePicker = (ImageView) findViewById(R.id.place_picker);
         mSearchText=findViewById(R.id.input_search);
+        getAddess = findViewById(R.id.valideAddress);
         mSearchText.setAdapter(new PlaceAutoSuggestAdapter(MapActivity.this,android.R.layout.simple_list_item_1));
 
         getLocationPermission();
 
+        getAddess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String data = mSearchText.getText().toString();
+                Intent intent = new Intent();
+                intent.putExtra("adresse", data);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+
     }
+
+
 
     private void init(){
         Log.d(TAG, "init: initializing");
@@ -199,9 +220,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM,
-                                    "My Location");
+                            if(currentLocation!=null){
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM,
+                                        "My Location");
+                            }else {
+                                Toast.makeText(MapActivity.this, "Please turn on your Location", Toast.LENGTH_LONG).show();
+                            }
 
                         }else{
                             Log.d(TAG, "onComplete: current location is null");

@@ -1,8 +1,6 @@
 package m.incrementrestservice.poulouloureminder.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.hardware.camera2.params.BlackLevelPattern;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +10,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.List;
 
-import m.incrementrestservice.poulouloureminder.MessageActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.model.Chat;
-import m.incrementrestservice.poulouloureminder.model.User;
 
 public class messageAdapter extends RecyclerView.Adapter<messageAdapter.ViewHolder>{
 
@@ -30,18 +26,20 @@ public class messageAdapter extends RecyclerView.Adapter<messageAdapter.ViewHold
     public static final  int MSG_TYPE_RIGHT = 1;
     private Context mContext;
     private List<Chat> mChat;
+    private String imageUrl;
 
     FirebaseUser firebaseUser;
 
-    public messageAdapter(Context mContext, List<Chat> mChat){
+    public messageAdapter(Context mContext, List<Chat> mChat, String imageUrl){
         this.mContext = mContext;
         this.mChat= mChat;
+        this.imageUrl= imageUrl;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         public TextView show_message;
-        //public ImageView profileImage;
+        public ImageView profileImage;
         public  TextView textSeen;
 
         public  TextView lastMessage;
@@ -50,7 +48,7 @@ public class messageAdapter extends RecyclerView.Adapter<messageAdapter.ViewHold
             super(itemView);
 
             show_message = itemView.findViewById(R.id.showMessage);
-            //profileImage = itemView.findViewById(R.id.image_profile);
+            profileImage = itemView.findViewById(R.id.image_profile);
             textSeen = itemView.findViewById(R.id.textSeen);
             lastMessage = itemView.findViewById(R.id.last_message);
 
@@ -77,11 +75,11 @@ public class messageAdapter extends RecyclerView.Adapter<messageAdapter.ViewHold
         Chat chat = mChat.get(position);
         holder.show_message.setText(chat.getmessage());
 
-        /*if(chat.getImageURL().equals("default")){
+        if(imageUrl.equals("default")){
             holder.profileImage.setImageResource(R.mipmap.ic_launcher);
         }else{
-            Glide.with(mContext).load(user.getImageURL()).into(holder.profileImage);
-        }*/
+            Glide.with(mContext).load(imageUrl).into(holder.profileImage);
+        }
 
         if(position == mChat.size()-1){
             if (chat.isIsseen()){

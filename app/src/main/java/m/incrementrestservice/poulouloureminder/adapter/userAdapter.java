@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,12 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
-import m.incrementrestservice.poulouloureminder.DialogueParticipant;
 import m.incrementrestservice.poulouloureminder.MessageActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.model.Chat;
@@ -131,13 +128,13 @@ public class userAdapter extends RecyclerView.Adapter<userAdapter.ViewHolder>{
 
         final  User user = mUsers.get(position);
         holder.username.setText(user.username);
-        /*if(user.getImageURL().equals("default")){
+        if(user.ImageURL.equals("default")){
             holder.profileImage.setImageResource(R.mipmap.ic_launcher);
         }else{
-            Glide.with(mContext).load(user.getImageURL()).into(holder.profileImage);
+            Glide.with(mContext).load(user.ImageURL).into(holder.profileImage);
         }
 
-         */
+
         if (isChat){
 
             lastMessage(user.id_user,holder.last_message);

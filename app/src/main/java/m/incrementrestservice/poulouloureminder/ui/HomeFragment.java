@@ -24,8 +24,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import m.incrementrestservice.poulouloureminder.NewRdvActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.adapter.RdvAdapter;
 import m.incrementrestservice.poulouloureminder.model.Rdv;
+import m.incrementrestservice.poulouloureminder.notifications.Token;
 
 public class HomeFragment extends Fragment {
 
@@ -89,9 +92,19 @@ public class HomeFragment extends Fragment {
         Read_Rdv();
 
 
+        updateToken(FirebaseInstanceId.getInstance().getToken());
+
         return view;
     }
 
+
+    private void  updateToken(String token){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        Token token1 = new Token(token);
+        databaseReference.child(firebaseUser.getUid()).setValue(token1);
+
+    }
 
     private void Search_Rdv(String s) {
 
@@ -139,23 +152,17 @@ public class HomeFragment extends Fragment {
                     mRdv.clear();
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                         Rdv rdv = snapshot.getValue(Rdv.class);
-                        //HashMap <String, Rdv> hashMap = new HashMap<>();
-                        //hashMap.values()=snapshot.getValue(Rdv.class);
                         assert rdv!= null;
                         assert firebaseUser!= null;
-                        /*if(firebaseUser.getUid().equals(rdv.owner)){
-                            mRdv.add(rdv);
-                        }*/
                          for (Map.Entry mapentry : rdv.particip.entrySet()) {
                                 if(firebaseUser.getUid().equals(mapentry.getValue())){
                                     mRdv.add(rdv);
-
-
                                 }
-
                          }
 
                     }
+
+                    Collections.reverse(mRdv);
                     progressBar.setVisibility(View.GONE);
                     rdvAdapter = new RdvAdapter(getContext(),mRdv);
                     recyclerView_Rdv.setAdapter(rdvAdapter);

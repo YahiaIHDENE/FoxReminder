@@ -1,19 +1,28 @@
 package m.incrementrestservice.poulouloureminder.ui;
 
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -24,10 +33,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.model.User;
 
+import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -37,7 +54,13 @@ public class profileFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private DatabaseReference mDatabase;
     private ProgressBar progressbar;
+    StorageReference storageReference;
+
     String userId;
+    CircleImageView imageProfile;
+    private static final int IMAGE_REQUEST = 1;
+    private Uri imageUri;
+    private StorageTask uploadTask;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,11 +75,12 @@ public class profileFragment extends Fragment {
         final TextView txtNewPassword = root.findViewById(R.id.setPassword_profile);
         final TextView txtNewPassword2 = root.findViewById(R.id.setPassword_profile_cofirmation);
         final TextView txtOldPassword = root.findViewById(R.id.oldPassword_profile);
-
+        imageProfile = root.findViewById(R.id.avatar_profile);
         progressbar = root.findViewById(R.id.progressBarProfile);
         progressbar.setVisibility(VISIBLE);
 
 
+        storageReference = FirebaseStorage.getInstance().getReference("uploads");
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         userId = firebaseAuth.getCurrentUser().getUid();
@@ -65,8 +89,21 @@ public class profileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                emailProfile.setText(dataSnapshot.child("email").getValue().toString());
-                usernameProfile.setText(dataSnapshot.child("username").getValue().toString());
+                if (getActivity() == null) {
+                    return;
+                }
+                if(isAdded()) {
+                    emailProfile.setText(dataSnapshot.child("email").getValue().toString());
+                    usernameProfile.setText(dataSnapshot.child("username").getValue().toString());
+
+                    String imageUrl = dataSnapshot.child("ImageURL").getValue().toString();
+                    if (imageUrl.equals("default")) {
+                        imageProfile.setImageResource(R.mipmap.ic_launcher);
+                    } else {
+                        Glide.with(getActivity()).load(imageUrl).into(imageProfile);
+                    }
+                }
+
                 progressbar.setVisibility(GONE);
 
             }
@@ -161,17 +198,100 @@ public class profileFragment extends Fragment {
                     progressbar.setVisibility(GONE);
                     Toast.makeText(getActivity(), " Please make sure that all the specifics fields are filled out properly", Toast.LENGTH_LONG).show();
                     return;
-
-
                 }
+            }
+        });
 
-
-
+        imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImage();
             }
         });
 
 
-
         return root;
+    }
+
+    private void openImage() {
+
+        Intent intent = new Intent();
+        intent.setType("image/");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent,IMAGE_REQUEST);
+
+    }
+
+    private String getFileExtension(Uri uri){
+        ContentResolver contentResolver = getContext().getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getMimeTypeFromExtension(contentResolver.getType(uri));
+    }
+
+    private  void uploadImage(){
+        final ProgressDialog pd  = new ProgressDialog(getContext());
+        pd.setMessage("Uploading");
+        pd.show();
+
+        if (imageUri!=null){
+            final StorageReference filereference = storageReference.child(System.currentTimeMillis()+"."+getFileExtension(imageUri));
+            uploadTask = filereference.putFile(imageUri);
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return filereference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri> () {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()){
+                        Uri downloadUri = task.getResult();
+                        String mUri = downloadUri.toString();
+                        mDatabase = FirebaseDatabase.getInstance().getReference("users").child(firebaseUser.getUid());
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("ImageURL", mUri);
+                        mDatabase.updateChildren(hashMap);
+
+                        pd.dismiss();
+                    }else {
+                        Toast.makeText(getContext(),"Failed", Toast.LENGTH_LONG).show();
+                        pd.dismiss();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    pd.dismiss();
+                }
+            });
+        }else {
+            Toast.makeText(getContext(),"No image seected", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==IMAGE_REQUEST && resultCode== RESULT_OK && data != null && data.getData()!= null){
+            imageUri = data.getData();
+
+            if (uploadTask!=null && uploadTask.isInProgress()){
+                Toast.makeText(getContext(),"Upload in progress", Toast.LENGTH_LONG).show();
+            }else {
+                uploadImage();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Glide.with(getContext()).pauseRequests();
+
     }
 }

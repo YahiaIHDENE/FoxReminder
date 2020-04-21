@@ -5,14 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,17 +18,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.adapter.userAdapter;
-import m.incrementrestservice.poulouloureminder.model.Chat;
 import m.incrementrestservice.poulouloureminder.model.Chatlist;
 import m.incrementrestservice.poulouloureminder.model.User;
-import m.incrementrestservice.poulouloureminder.notifications.Token;
 
 public class SendFragment extends Fragment {
 
@@ -44,6 +36,7 @@ public class SendFragment extends Fragment {
     FirebaseUser firebaseUser;
     DatabaseReference databaseReference;
     ProgressBar progressBar;
+    String userID;
 
     private List<Chatlist> listUsers;
 
@@ -57,10 +50,10 @@ public class SendFragment extends Fragment {
         recyclerView_send.setHasFixedSize(true);
         recyclerView_send.setLayoutManager(new LinearLayoutManager(getContext()));
 
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         listUsers = new ArrayList<>();
 
+        userID = firebaseUser.getUid();
         databaseReference = FirebaseDatabase.getInstance().getReference("Chatlist").child(firebaseUser.getUid());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -82,17 +75,18 @@ public class SendFragment extends Fragment {
             }
         });
 
-        updateToken(FirebaseInstanceId.getInstance().getToken());
+       // updateToken(FirebaseInstanceId.getInstance().getToken());
 
         return view;
     }
 
-    private void  updateToken(String token){
+
+    /*private void  updateToken(String token){
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
         Token token1 = new Token(token);
         databaseReference.child(firebaseUser.getUid()).setValue(token1);
 
-    }
+    }*/
 
     private  void  Chat_list(){
 
@@ -124,10 +118,4 @@ public class SendFragment extends Fragment {
 
     }
 
-    public void onStart(){
-
-
-        super.onStart();
-        //update your fragment
-    }
 }

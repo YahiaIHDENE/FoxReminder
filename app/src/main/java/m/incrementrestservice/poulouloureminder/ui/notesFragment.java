@@ -1,7 +1,6 @@
 package m.incrementrestservice.poulouloureminder.ui;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,14 +10,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,17 +26,13 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
-import m.incrementrestservice.poulouloureminder.MainActivity;
 import m.incrementrestservice.poulouloureminder.NewNoteActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.adapter.NotesAdapter;
-import m.incrementrestservice.poulouloureminder.adapter.userAdapter;
-import m.incrementrestservice.poulouloureminder.login;
 import m.incrementrestservice.poulouloureminder.model.Notes;
-import m.incrementrestservice.poulouloureminder.model.User;
 
 public class notesFragment extends Fragment {
 
@@ -124,6 +114,7 @@ public class notesFragment extends Fragment {
                     }
                 }
 
+                Collections.reverse(mNotes);
                 notesAdapter = new NotesAdapter(getContext(),mNotes);
                 recyclerView_notes.setAdapter(notesAdapter);
                 progressBar.setVisibility(View.GONE);

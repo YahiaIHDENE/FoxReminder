@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -89,7 +90,7 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        apiService = Client.getClient("https://fcm.googleapi.com/").create(APIService.class);
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         image_profile =findViewById(R.id.image_profile);
         username = findViewById(R.id.Username_chat);
@@ -115,13 +116,13 @@ public class MessageActivity extends AppCompatActivity {
 
                 User user = dataSnapshot.getValue(User.class);
                 username.setText(user.username);
-               /*if(user.ImageURL().equals("default")){
-                    profile_image.setImageRessource(R.mipmap.ic_launcher_round)
+               if(user.ImageURL.equals("default")){
+                   image_profile.setImageResource(R.mipmap.ic_launcher_round);
                 }else{
-                    Glide.with(getApplicationContext().load(user.getImageURL()).intro(image_profile));
-                }*/
+                    Glide.with(MessageActivity.this).load(user.ImageURL).into(image_profile);
+                }
 
-               readMessage(firebaseUser.getUid(),useridIntent);
+               readMessage(firebaseUser.getUid(),useridIntent, user.ImageURL);
 
 
             }
@@ -229,8 +230,9 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                //sendNotification(receiver, user.username, msg);
+                sendNotification(receiver, user.username, msg);
                 if (notify){
+
                     sendNotification(receiver, user.username, msg);
                 }
                 notify = false;
@@ -245,7 +247,7 @@ public class MessageActivity extends AppCompatActivity {
 
     }
 
-    private void sendNotification(String receiver, final String username, final String msg) {
+    private void sendNotification(final  String receiver, final String username, final String msg) {
         final DatabaseReference token = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = token.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
@@ -263,6 +265,9 @@ public class MessageActivity extends AppCompatActivity {
                                         if (response.body().success !=1){
                                             Toast.makeText(MessageActivity.this, "Failed! ",Toast.LENGTH_LONG).show();
                                         }
+                                    }else {
+                                        Toast.makeText(MessageActivity.this, "Message sent "+response.message(),Toast.LENGTH_LONG).show();
+
                                     }
                                 }
 
@@ -282,7 +287,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
 
-    public void readMessage(final String myId, final String userId/*, imageURL*/){
+    public void readMessage(final String myId, final String userId, final String imageURL){
 
         mchat = new ArrayList<>();
         mDatabase = FirebaseDatabase.getInstance().getReference("Chats");
@@ -297,7 +302,7 @@ public class MessageActivity extends AppCompatActivity {
 
                     }
 
-                    messageAdapter1 = new messageAdapter(MessageActivity.this, mchat/*,   imageURL*/);
+                    messageAdapter1 = new messageAdapter(MessageActivity.this, mchat,   imageURL);
                     recyclerView.setAdapter(messageAdapter1);
 
                 }

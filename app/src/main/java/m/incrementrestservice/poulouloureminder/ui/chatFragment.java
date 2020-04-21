@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import m.incrementrestservice.poulouloureminder.R;
-import m.incrementrestservice.poulouloureminder.model.User;
 import m.incrementrestservice.poulouloureminder.adapter.userAdapter;
+import m.incrementrestservice.poulouloureminder.model.User;
 
 public class chatFragment extends Fragment {
     private RecyclerView recyclerView;

@@ -1,9 +1,11 @@
 package m.incrementrestservice.poulouloureminder;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -40,18 +43,27 @@ import static android.view.View.GONE;
 
 public class RdvActivity extends AppCompatActivity implements DialogueParticipant.DialogueParticipantInterface, DatePickerDialog.OnDateSetListener{
 
+    //Standar Widget
     CircleImageView icone;
-    TextView titleRdv2;
     TextView titleRdv;
-    //ImageButton shar_btn;
+    TextView owner ;
+
+    //Owner widget
+    TextView titleRdv2;
     ImageButton added_shar ;
     TextView date ;
     ImageButton setdate;
     EditText adress_rdv ;
     ImageButton setadress;
     EditText text ;
-    TextView owner ;
     ImageButton setRdv ,deleterdv;
+
+    //Client Widget
+    TextView Title_Rdvclient ;
+    TextView date_Rdvclient ;
+    TextView adress_Rdvclient ;
+    TextView Rdvtextclienet ;
+
 
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
@@ -63,7 +75,16 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
     HashMap<String, String> hashMapp;
 
     ProgressBar progressBar;
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                String myStr = data.getStringExtra("adresse");
+                adress_rdv.setText(myStr);
+            }
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,19 +104,25 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
 
         icone = findViewById(R.id.image_Rdv);
         titleRdv = findViewById(R.id.Title_Rdv);
+        progressBar = findViewById(R.id.progressBarAddRddv);
+        owner =findViewById(R.id.owner);
+
+
         titleRdv2 = findViewById(R.id.Title_Rdv2);
         added_shar = findViewById(R.id.added_btn);
         date = findViewById(R.id.date_Rdv);
         adress_rdv = findViewById(R.id.adress_Rdv1);
         text =findViewById(R.id.Rdvtext);
-        owner =findViewById(R.id.owner);
-
         setdate = findViewById(R.id.editdate);
         setadress = findViewById(R.id.editadress);
-
         deleterdv = findViewById(R.id.deleteRdv);
         setRdv = findViewById(R.id.setRdv);
-        progressBar = findViewById(R.id.progressBarAddRddv);
+
+
+        Title_Rdvclient = findViewById(R.id.Title_Rdvclient);
+        date_Rdvclient = findViewById(R.id.date_Rdvclient);
+        adress_Rdvclient = findViewById(R.id.adress_Rdvclient);
+        Rdvtextclienet = findViewById(R.id.Rdvtextclient);
 
         setdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,15 +146,41 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                 final  Rdv rdvs = dataSnapshot.getValue(Rdv.class);
                 if(rdvs!=null){
                     titleRdv.setText(rdvs.title);
-                    titleRdv.setHint(rdvs.title);
-                    titleRdv2.setText(rdvs.title);
-                    titleRdv2.setHint(rdvs.title);
-                    date.setText(rdvs.date);
-                    date.setHint(rdvs.date);
-                    adress_rdv.setText(rdvs.adress);
-                    adress_rdv.setHint(rdvs.adress);
-                    text.setText(rdvs.text);
-                    text.setHint(rdvs.text);
+
+                    if(rdvs.owner.equals(firebaseUser.getUid())){
+
+                        Title_Rdvclient.setVisibility(View.INVISIBLE);
+                        date_Rdvclient.setVisibility(View.INVISIBLE);
+                        adress_Rdvclient.setVisibility(View.INVISIBLE);
+                        Rdvtextclienet.setVisibility(View.INVISIBLE);
+
+                        titleRdv2.setText(rdvs.title);
+                        titleRdv2.setHint(rdvs.title);
+                        date.setText(rdvs.date);
+                        date.setHint(rdvs.date);
+                        adress_rdv.setText(rdvs.adress);
+                        adress_rdv.setHint(rdvs.adress);
+                        text.setText(rdvs.text);
+                        text.setHint(rdvs.text);
+                    }else{
+
+                        titleRdv2.setVisibility(View.INVISIBLE);
+                        date.setVisibility(View.INVISIBLE);
+                        adress_rdv.setVisibility(View.INVISIBLE);
+                        text.setVisibility(View.INVISIBLE);
+                        setdate.setVisibility(View.INVISIBLE);
+                        setadress.setVisibility(View.INVISIBLE);
+                        deleterdv.setVisibility(View.INVISIBLE);
+                        setRdv.setVisibility(View.INVISIBLE);
+
+                        Title_Rdvclient.setText(rdvs.title);
+                        date_Rdvclient.setText("For : "+rdvs.date);
+                        adress_Rdvclient.setText("Address : "+rdvs.adress) ;
+                        Rdvtextclienet.setText("Note : "+rdvs.text);
+
+                    }
+
+
 
                      hashMap = rdvs.particip;
 
@@ -157,7 +210,6 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                         @Override
                         public void onClick(View v) {
                             OpenDialogue(hashMap);
-
                         }
                     });
 
@@ -176,7 +228,40 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                         }
 
                     });
-
+                    setadress.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(RdvActivity.this, MapActivity.class);
+                            startActivityForResult(intent, 1);
+                        }
+                    });
+                    adress_Rdvclient.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(RdvActivity.this, "Maps lanching", Toast.LENGTH_LONG).show();
+                            String adresse =  adress_Rdvclient.getText().toString().replaceAll("Address : "," ");
+                            System.out.println("//////////////////// "+adresse+" ///////////////////");
+                            String uri = "http://maps.google.com/maps?daddr=" +adresse;
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                            intent.setPackage("com.google.android.apps.maps");
+                            try
+                            {
+                                startActivity(intent);
+                            }
+                            catch(ActivityNotFoundException ex)
+                            {
+                                try
+                                {
+                                    Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                                    startActivity(unrestrictedIntent);
+                                }
+                                catch(ActivityNotFoundException innerEx)
+                                {
+                                    Toast.makeText(RdvActivity.this, "Please install a maps application", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
                 }
             }
 
@@ -256,33 +341,32 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             progressBar.setVisibility(View.VISIBLE);
 
-
                             String date1 = date.getText().toString().trim();
                             String titre = titleRdv2.getText().toString().trim();
                             String rdv = text.getText().toString().trim();
                             String adress = adress_rdv.getText().toString().trim();
                             HashMap<String, String> hashMap1 = new HashMap<>();
 
-                            if (hashMapp!=null) {
+                            if (hashMap!=null||hashMap.size()<1) {
 
-                                hashMap = hashMapp;
+                                hashMap1 = hashMap;
                             }else{
-                                hashMap1.put("id_invit_0", "default");
+                                hashMap1.put("id_invit_0", firebaseUser.getUid());
 
                             }
 
-                            HashMap<String , Object> hashMap = new HashMap<>();
-                            hashMap.put("title" ,titre);
-                            hashMap.put("date" ,date1);
-                            hashMap.put("text" ,rdv);
-                            hashMap.put("owner" ,firebaseUser.getUid());
-                            hashMap.put("search" ,titre.toLowerCase());
-                            hashMap.put("id_rdv" ,rdvid);
-                            hashMap.put("adress" ,adress);
-                            hashMap.put("particip" ,hashMap1);
+                            HashMap<String , Object> hashMapfinal = new HashMap<>();
+                            hashMapfinal.put("title" ,titre);
+                            hashMapfinal.put("date" ,date1);
+                            hashMapfinal.put("text" ,rdv);
+                            hashMapfinal.put("owner" ,firebaseUser.getUid());
+                            hashMapfinal.put("search" ,titre.toLowerCase());
+                            hashMapfinal.put("id_rdv" ,rdvid);
+                            hashMapfinal.put("adress" ,adress);
+                            hashMapfinal.put("particip" ,hashMap1);
                             Toast.makeText(RdvActivity.this, "appointment "+titleRdv.getText().toString()+" updated .",Toast.LENGTH_LONG).show();
 
-                            mDatabase.updateChildren(hashMap);
+                            mDatabase.updateChildren(hashMapfinal);
                             progressBar.setVisibility(GONE);
 
 

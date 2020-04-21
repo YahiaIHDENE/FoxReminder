@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import m.incrementrestservice.poulouloureminder.adapter.participantAdapter;
 import m.incrementrestservice.poulouloureminder.model.User;
@@ -50,7 +51,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
     private ProgressBar progressBar;
     EditText searchUsers;
     public  DialogueParticipantInterface listner;
-    public  HashMap<String,String> mapUsers;
+    //public  HashMap<String,String> mapUsers;
 
     @NonNull
     @Override
@@ -104,6 +105,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
+                            HashMap<String,String> mapUsers;
                             mapUsers = participantAdapter.hashMap;
                             mapUsers.put("invite_0",firebaseUser.getUid());
                             listner.ApplyAdds(mapUsers);
@@ -111,6 +113,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
 
                     });
         }else {
+
             String id_owner = (String)hashMap.get("invite_0");
             if (id_owner.equals(firebaseUser.getUid())){
                 textDialouge = "Edit";
@@ -127,17 +130,23 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
+                                HashMap<String,String> mapUsers;
                                 mapUsers = participantAdapter.hashMap;
                                 listner.ApplyAdds(mapUsers);
                             }
 
                         });
+                System.out.println("######################Dialogue PRT SETED 1 ############################");
+                for (Map.Entry mapentry : hashMap.entrySet()) {
+                    System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
+                }
             }else {
                 builder.setView(view)
                         .setTitle("List of participators")
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                HashMap<String,String> mapUsers;
                                 mapUsers = participantAdapter.hashMap;
                                 listner.ApplyAdds(mapUsers);
                             }

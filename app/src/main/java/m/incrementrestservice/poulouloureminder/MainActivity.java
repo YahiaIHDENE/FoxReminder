@@ -3,16 +3,21 @@ package m.incrementrestservice.poulouloureminder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.os.CountDownTimer;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,22 +27,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.HashMap;
 
-import m.incrementrestservice.poulouloureminder.ui.chatFragment;
+import de.hdodenhof.circleimageview.CircleImageView;
 import m.incrementrestservice.poulouloureminder.ui.HomeFragment;
-import m.incrementrestservice.poulouloureminder.ui.notesFragment;
-import m.incrementrestservice.poulouloureminder.ui.profileFragment;
 import m.incrementrestservice.poulouloureminder.ui.SendFragment;
 import m.incrementrestservice.poulouloureminder.ui.ShareFragment;
+import m.incrementrestservice.poulouloureminder.ui.chatFragment;
+import m.incrementrestservice.poulouloureminder.ui.notesFragment;
+import m.incrementrestservice.poulouloureminder.ui.profileFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -45,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
       Toolbar toolbar;
 
     private  TextView Email, userName;
+    private CircleImageView imageView;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private DatabaseReference mDatabase;
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
@@ -72,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Email = headview.findViewById(R.id.email_header);
         userName =headview.findViewById(R.id.username_header);
+        imageView =headview.findViewById(R.id.imageView);
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -83,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                Email.setText(dataSnapshot.child("email").getValue().toString());
                 userName.setText(dataSnapshot.child("username").getValue().toString());
+                String imageUrl = dataSnapshot.child("ImageURL").getValue().toString();
+                if(imageUrl.equals("default")){
+                    imageView.setImageResource(R.mipmap.ic_launcher);
+                }else{
+                    Glide.with(getApplicationContext()).load(imageUrl).into(imageView);
+                }
 
             }
 
@@ -224,5 +231,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Glide.with(getApplicationContext()).pauseRequests();
+
     }
 }

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -61,15 +62,19 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
 
         final  User user = mUsers.get(position);
         holder.username.setText(user.username);
-
+        if(user.ImageURL.equals("default")){
+            holder.profileImage.setImageResource(R.mipmap.ic_launcher);
+        }else{
+            Glide.with(mContext).load(user.ImageURL).into(holder.profileImage);
+        }
         if (hashMap!=null){
             for (Map.Entry<String,String> mapentry : hashMap.entrySet()){
                 if (user.id_user.equals(mapentry.getValue())){
                     holder.checkbox.setVisibility(View.VISIBLE);
                 }
             }
+
             for (Map.Entry<String, String> entry : hashMap.entrySet()) {
-                System.out.println("+++++++++++++++++++++++     "+ entry.getKey()+"     ++++++++++++++++");
                 /*if (i<Integer.getInteger(entry.getKey())){
                     i = Integer.getInteger(entry.getKey())+1;
                 }*/
@@ -78,6 +83,10 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
             hashMap= new HashMap<>();
         }
 
+        System.out.println("######################ADAPTER 0############################");
+        for (Map.Entry mapentry : hashMap.entrySet()) {
+            System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
+        }
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_owner = (String)hashMap.get("invite_0");
         if (id_owner!=null){
@@ -94,9 +103,18 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
                 holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        i++;
-                        hashMap.put("invite_" + i, user.id_user);
-                        holder.checkbox.setVisibility(View.VISIBLE);
+
+                        if (!hashMap.containsValue(user.id_user)){
+
+                            String time = String.valueOf(System.currentTimeMillis());
+                            hashMap.put("invite_" + time, user.id_user);
+                            holder.checkbox.setVisibility(View.VISIBLE);
+                        }
+                        System.out.println("######################EDIT PARTICIP SETED 1############################");
+                        for (Map.Entry mapentry : hashMap.entrySet()) {
+                              System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
+                        }
+                        System.out.println("###############################################################");
                         return true;
                     }
                 });
@@ -116,8 +134,8 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
                 holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        i++;
-                        hashMap.put("invite_" + i, user.id_user);
+                        String time = String.valueOf(System.currentTimeMillis());
+                        hashMap.put("invite_" + time, user.id_user);
                         holder.checkbox.setVisibility(View.VISIBLE);
                         return true;
                     }

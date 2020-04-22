@@ -41,12 +41,15 @@ public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerView_Rdv;
     private RdvAdapter rdvAdapter;
+   // public addDelete listner;
+
     private List<Rdv> mRdv;
     EditText searchRdv;
 
     ProgressBar progressBar;
 
     ImageButton btn_add;
+    ImageButton removerdvitem;
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -54,10 +57,19 @@ public class HomeFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         btn_add = view.findViewById(R.id.addrdvitem);
+        removerdvitem = view.findViewById(R.id.addrdvitem);
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                String allString = "=1ghdkthxklghxclgcxggc0+2gclljvljyhvljhvlhk0#";
+                String user = allString.substring(allString.indexOf("="),allString.indexOf("+")-1);
+                String idrvd = allString.substring(allString.indexOf("+"),allString.indexOf("#")-1);
+                System.out.println("++++++++++++++++++++++++++++"+user+"+++++++++++++++++++++++");
+                System.out.println("++++++++++++++++++++++++++++"+idrvd+"+++++++++++++++++++++++");
+
                 startActivity(new Intent(getActivity(), NewRdvActivity.class));
+
 
             }
         });
@@ -90,6 +102,13 @@ public class HomeFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressBarrdv);
         progressBar.setVisibility(View.VISIBLE);
         Read_Rdv();
+        List<String> deleteList;
+
+       /* if (rdvAdapter.hashMap!=null){
+            //deleteList = rdvAdapter.list;
+            btn_add.setVisibility(View.INVISIBLE);
+            removerdvitem.setVisibility(View.VISIBLE);
+        }*/
 
 
         updateToken(FirebaseInstanceId.getInstance().getToken());
@@ -178,6 +197,18 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+/*
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        listner = (addDelete) context;
+    }
+
+    public interface addDelete{
+        void delete(HashMap<String,String> hashMap);
+    }
+
+ */
 
 }
 

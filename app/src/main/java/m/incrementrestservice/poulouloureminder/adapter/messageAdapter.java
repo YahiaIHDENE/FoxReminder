@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Calendar;
 import java.util.List;
 
 import m.incrementrestservice.poulouloureminder.R;
@@ -83,9 +82,9 @@ public class messageAdapter extends RecyclerView.Adapter<messageAdapter.ViewHold
 
         if(position == mChat.size()-1){
             if (chat.isIsseen()){
-                holder.textSeen.setText("Seen at "+ Calendar.getInstance().get(Calendar.HOUR_OF_DAY)+"h"+Calendar.getInstance().get(Calendar.MINUTE)+"mn");
+                holder.textSeen.setText("Seen");
             }else {
-                holder.textSeen.setText("Delivred "+  Calendar.getInstance().get(Calendar.HOUR_OF_DAY)+"h"+Calendar.getInstance().get(Calendar.MINUTE)+"mn");
+                holder.textSeen.setText("Delivred");
             }
         }else {
             holder.textSeen.setVisibility(View.GONE);

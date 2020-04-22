@@ -160,7 +160,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
 
                     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                     long time = System.currentTimeMillis();
-                    String idRdv = String.valueOf(time) + "-" + firebaseUser.getUid();
+                    final  String idRdv = String.valueOf(time) + "-" + firebaseUser.getUid();
                     HashMap<String, String> hashMap = new HashMap<>();
                     if (hashMapp != null) {
 
@@ -183,7 +183,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
 
                             if (task.isSuccessful()) {
                                 //sendNotification(hashMapp, "username", titre );
-                                Toast.makeText(NewRdvActivity.this, "Appointment addes.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(NewRdvActivity.this, "Appointment added.", Toast.LENGTH_LONG).show();
 
                                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("users").child(rdv.owner);
                                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -191,10 +191,10 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         User user = dataSnapshot.getValue(User.class);
                                         for (Map.Entry mapentry : rdv.particip.entrySet()) {
-                                            sendNotification(mapentry.getValue().toString(), user.username, rdv.title);
+                                            sendNotification(mapentry.getValue().toString(), user.username, rdv.title, rdv.id_rdv);
                                             if (notify) {
 
-                                                sendNotification(mapentry.getValue().toString(), user.username, rdv.title);
+                                                sendNotification(mapentry.getValue().toString(), user.username, rdv.title, rdv.id_rdv);
                                             }
                                         }
                                         notify = false;
@@ -243,7 +243,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
     }
 
 
-    private void sendNotification(final String receiver, final String username, final String msg) {
+    private void sendNotification(final String receiver, final String username, final String msg, final String idrdv) {
 
         final DatabaseReference token = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = token.orderByKey().equalTo(receiver);
@@ -253,7 +253,7 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
                     final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                    Data data = new Data(firebaseUser.getUid(), R.mipmap.ic_launcher_round, username + ":" + msg, " Invited you to an appointment", receiver);
+                    Data data = new Data("="+firebaseUser.getUid()+"+"+idrdv+"#", R.drawable.logo, "appointment title :" + msg, username+" Added you", receiver);
                     Sender sender = new Sender(data, token.getToken());
                     apiService.sendNotification(sender)
                             .enqueue(new Callback<MyResponse>() {
@@ -261,11 +261,10 @@ public class NewRdvActivity extends AppCompatActivity implements DialoguePartici
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(NewRdvActivity.this, "*****Failed!**** " + response, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(NewRdvActivity.this, "Failed!" + response, Toast.LENGTH_LONG).show();
                                         }
                                     } else {
                                         Toast.makeText(NewRdvActivity.this, "Notification sent " + response.message(), Toast.LENGTH_LONG).show();
-                                        System.out.println("++++++++++++++++++++    SENT SUCCEFFULY       +++++++++++++++");
                                     }
                                 }
 

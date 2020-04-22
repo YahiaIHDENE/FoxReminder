@@ -83,7 +83,7 @@
                                 android:id="@+id/added_btn"
                                 android:layout_width="50dp"
                                 android:layout_height="50dp"
-                                android:src="@drawable/ic_added"
+                                android:background="@drawable/ic_added"
                                 android:visibility="visible"
                                 android:layout_marginTop="10dp"
                                 android:layout_marginLeft="10dp"/>
@@ -121,14 +121,14 @@
 
                             <ImageButton
                                 android:id="@+id/editdate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
                                 android:layout_below="@+id/Title_Rdv2"
-                                android:layout_marginTop="15dp"
+                                android:layout_marginTop="20dp"
                                 android:layout_toEndOf="@+id/date_Rdv"
                                 android:layout_toRightOf="@+id/date_Rdv"
                                 android:visibility="visible"
-                                android:src="@drawable/ic_calender" />
+                                android:background="@drawable/ic_calender" />
 
 
 
@@ -150,14 +150,14 @@
 
                             <ImageButton
                                 android:id="@+id/editadress"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
                                 android:layout_below="@+id/date_Rdv"
-                                android:layout_marginTop="15dp"
+                                android:layout_marginTop="20dp"
                                 android:layout_toEndOf="@+id/adress_Rdv1"
                                 android:layout_toRightOf="@+id/adress_Rdv1"
                                 android:visibility="visible"
-                                android:src="@drawable/ic_edit_location" />
+                                android:background="@drawable/ic_edit_location" />
 
                             <EditText
                                 android:id="@+id/Rdvtext"

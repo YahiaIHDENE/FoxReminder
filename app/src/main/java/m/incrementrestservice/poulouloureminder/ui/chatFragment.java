@@ -90,7 +90,9 @@ public class chatFragment extends Fragment {
                     assert user != null;
                     assert fUser != null;
                     if (!fUser.getUid().equals(user.id_user)) {
-                        mUser.add(user);
+                        if (user.count_stat.equals("Yes")){
+                            mUser.add(user);
+                        }
                     }
                 }
 
@@ -112,6 +114,8 @@ public class chatFragment extends Fragment {
 
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        final DatabaseReference token = FirebaseDatabase.getInstance().getReference("Tokens");
+
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -126,8 +130,9 @@ public class chatFragment extends Fragment {
                         assert user!= null;
                         assert firebaseUser!= null;
                         if(!firebaseUser.getUid().equals(user.id_user)){
-
+                            if (user.count_stat.equals("Yes")){
                                 mUser.add(user);
+                            }
                         }
 
                     }

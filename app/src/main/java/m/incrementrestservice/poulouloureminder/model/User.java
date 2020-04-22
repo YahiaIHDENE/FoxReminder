@@ -1,7 +1,5 @@
 package m.incrementrestservice.poulouloureminder.model;
 
-import android.widget.Button;
-
 public class User {
 
     public String id_user;
@@ -10,6 +8,7 @@ public class User {
     public String ImageURL;
     public String status;
     public String search;
+    public String count_stat;
 
 
     public User() {
@@ -17,13 +16,14 @@ public class User {
     }
 
 
-    public User(String id_user, String username,String email, String ImageURL, String status, String search) {
+    public User(String id_user, String username,String email, String ImageURL, String status, String search, String count_stat) {
         this.id_user = id_user;
         this.username = username;
         this.email = email;
         this.ImageURL = ImageURL;
         this.status = status;
         this.search = search;
+        this.count_stat = count_stat;
     }
 
     public String getUsername() {

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,7 +48,7 @@ public class userAdapter extends RecyclerView.Adapter<userAdapter.ViewHolder>{
         public ImageView img_on;
         public ImageView img_off;
         public  TextView last_message;
-        public ImageButton checkbox;
+        public ImageView checkbox;
 
 
 
@@ -62,7 +61,7 @@ public class userAdapter extends RecyclerView.Adapter<userAdapter.ViewHolder>{
             img_on = itemView.findViewById(R.id.img_on);
             img_off = itemView.findViewById(R.id.img_off);
             last_message= itemView.findViewById(R.id.last_message);
-            checkbox= itemView.findViewById(R.id.checkbox);
+            checkbox = itemView.findViewById(R.id.checkbox);
 
         }
     }

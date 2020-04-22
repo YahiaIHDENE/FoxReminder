@@ -74,7 +74,7 @@
                     android:id="@+id/shar_btn"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:src="@drawable/ic_participants"
+                    android:background="@drawable/ic_participants"
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="10dp"/>
 
@@ -123,13 +123,14 @@
 
                 <ImageButton
                     android:id="@+id/editdate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_below="@+id/Title_Rdv2"
                     android:layout_marginTop="15dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_toEndOf="@+id/date_Rdv"
                     android:layout_toRightOf="@+id/date_Rdv"
-                    android:src="@drawable/ic_calender" />
+                    android:background="@drawable/ic_calender" />
 
                 <EditText
                     android:id="@+id/adress_Rdv"
@@ -148,13 +149,13 @@
 
                 <ImageButton
                     android:id="@+id/editadress1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_below="@+id/date_Rdv"
                     android:layout_marginTop="25dp"
                     android:layout_toEndOf="@+id/adress_Rdv"
                     android:layout_toRightOf="@+id/adress_Rdv"
-                    android:src="@drawable/ic_location" />
+                    android:background="@drawable/ic_location" />
 
                 <EditText
                     android:id="@+id/Rdvtext"

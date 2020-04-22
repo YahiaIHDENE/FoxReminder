@@ -30,7 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import m.incrementrestservice.poulouloureminder.adapter.participantAdapter;
 import m.incrementrestservice.poulouloureminder.model.User;
@@ -136,10 +135,7 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                             }
 
                         });
-                System.out.println("######################Dialogue PRT SETED 1 ############################");
-                for (Map.Entry mapentry : hashMap.entrySet()) {
-                    System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
-                }
+
             }else {
                 builder.setView(view)
                         .setTitle("List of participators")
@@ -184,7 +180,9 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                     assert user != null;
                     assert fUser != null;
                     if (!fUser.getUid().equals(user.id_user)) {
-                        mUser.add(user);
+                        if (user.count_stat.equals("Yes")){
+                            mUser.add(user);
+                        }
                     }
                 }
 
@@ -219,7 +217,9 @@ public class DialogueParticipant extends AppCompatDialogFragment {
                         assert user!= null;
                         assert firebaseUser!= null;
                         if(!firebaseUser.getUid().equals(user.id_user)) {
-                            mUser.add(user);
+                            if (user.count_stat.equals("Yes")){
+                                mUser.add(user);
+                            }
                         }
                     }
 

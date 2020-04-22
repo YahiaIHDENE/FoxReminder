@@ -81,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String , Object> hashMap = new HashMap<>();
+                hashMap.put("count_stat" ,"Yes");
+
+                dataSnapshot.getRef().updateChildren(hashMap);
 
                Email.setText(dataSnapshot.child("email").getValue().toString());
                 userName.setText(dataSnapshot.child("username").getValue().toString());
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     Glide.with(getApplicationContext()).load(imageUrl).into(imageView);
                 }
+
 
             }
 

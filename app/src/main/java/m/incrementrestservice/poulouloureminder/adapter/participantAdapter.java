@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,7 +26,7 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
     private Context mContext;
     private List<User> mUsers;
     public HashMap<String,String> hashMap;
-    int i =0;
+
     public participantAdapter(Context mContext, List<User> mUsers, HashMap<String,String> hashMap){
         this.mContext = mContext;
         this.mUsers = mUsers;
@@ -39,7 +38,7 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
 
         public TextView username;
         public ImageView profileImage;
-        public ImageButton checkbox;
+        public ImageView checkbox;
 
         public  ViewHolder(View itemView){
             super(itemView);
@@ -83,10 +82,6 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
             hashMap= new HashMap<>();
         }
 
-        System.out.println("######################ADAPTER 0############################");
-        for (Map.Entry mapentry : hashMap.entrySet()) {
-            System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
-        }
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String id_owner = (String)hashMap.get("invite_0");
         if (id_owner!=null){
@@ -110,11 +105,6 @@ public class participantAdapter extends RecyclerView.Adapter<participantAdapter.
                             hashMap.put("invite_" + time, user.id_user);
                             holder.checkbox.setVisibility(View.VISIBLE);
                         }
-                        System.out.println("######################EDIT PARTICIP SETED 1############################");
-                        for (Map.Entry mapentry : hashMap.entrySet()) {
-                              System.out.println("Key : "+mapentry.getKey()+"  |  Value : "+mapentry.getValue());
-                        }
-                        System.out.println("###############################################################");
                         return true;
                     }
                 });

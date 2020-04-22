@@ -20,6 +20,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import m.incrementrestservice.poulouloureminder.MessageActivity;
+import m.incrementrestservice.poulouloureminder.RdvActivity;
 
 public class MyFirebaseMessaging extends FirebaseMessagingService {
 
@@ -28,6 +29,8 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         String sented = remoteMessage.getData().get("sented");
+        System.out.println("000000000000000000000000000000000000000000000000000000001");
+
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -36,11 +39,15 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 
                 sendAndOboveNotification(remoteMessage);
-            }else {
+                System.out.println("00000000000000000000000000000000000000000000000000000001111");
 
+            }else {
+                System.out.println("000000000000000000000000000000000000000000000000000000011111111");
                 sendNotification(remoteMessage);
+
             }
         }
+
     }
 
     private void sendNotification(RemoteMessage remoteMessage) {
@@ -49,6 +56,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String icon = remoteMessage.getData().get("icon");
         String body = remoteMessage.getData().get("body");
         String title = remoteMessage.getData().get("title");
+        System.out.println("0000000000000000000000000000000000000000000000000000000222222211");
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         int j = Integer.parseInt(user.replaceAll("[\\D]",""));
@@ -79,30 +87,62 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void  sendAndOboveNotification(RemoteMessage remoteMessage){
-
-        String user = remoteMessage.getData().get("user");
         String icon = remoteMessage.getData().get("icon");
         String body = remoteMessage.getData().get("body");
         String title = remoteMessage.getData().get("title");
+        System.out.println("++++++++++++++++++++++++++++"+title+"+++++++++++++++++++++++");
+        if (title.equals(" New message")){
 
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        int j = Integer.parseInt(user.replaceAll("[\\D]",""));
-        Intent intent = new Intent(this, MessageActivity.class);
-        Bundle bundle =new Bundle();
-        bundle.putString("userid", user);
-        intent.putExtras(bundle);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, j ,intent, PendingIntent.FLAG_ONE_SHOT);
-        Uri defaultSound  = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        OreoAndAbiveNotifications notifications = new OreoAndAbiveNotifications(this);
-        Notification.Builder builder = notifications.getNotification(title,body,pendingIntent,defaultSound, icon );
-        NotificationManager noti = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+            String user = remoteMessage.getData().get("user");
 
-        int i=0;
-        if (j>0){
-            i=j;
+            RemoteMessage.Notification notification = remoteMessage.getNotification();
+            System.out.println("11111111111111111111111111111111111111111111111111111111111111111111111111111");
+            int j = Integer.parseInt(user.replaceAll("[\\D]",""));
+            Intent intent = new Intent(this, MessageActivity.class);
+            Bundle bundle =new Bundle();
+            bundle.putString("userid",user );
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, j ,intent, PendingIntent.FLAG_ONE_SHOT);
+            Uri defaultSound  = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            OreoAndAbiveNotifications notifications = new OreoAndAbiveNotifications(this);
+            Notification.Builder builder = notifications.getNotification(title,body,pendingIntent,defaultSound, icon );
+            NotificationManager noti = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+            int i=0;
+            if (j>0){
+                i=j;
+            }
+            notifications.getManager().notify(i, builder.build());
+
+        }else {
+            System.out.println("222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
+            String allString = remoteMessage.getData().get("user");
+            String user = allString.substring(allString.indexOf("=")+1,allString.indexOf("+"));
+            String idrvd = allString.substring(allString.indexOf("+")+1,allString.indexOf("#"));
+            System.out.println("///////////////////////|"+user+"|///////////////////////");
+            System.out.println("///////////////////////|"+idrvd+"|///////////////////////");
+
+            int j = Integer.parseInt(user.replaceAll("[\\D]",""));
+            Intent intent = new Intent(this, RdvActivity.class);
+            Bundle bundle =new Bundle();
+            bundle.putString("rdvid", idrvd);
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, j ,intent, PendingIntent.FLAG_ONE_SHOT);
+            Uri defaultSound  = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            OreoAndAbiveNotifications notifications = new OreoAndAbiveNotifications(this);
+            Notification.Builder builder = notifications.getNotification(title,body,pendingIntent,defaultSound, icon );
+            NotificationManager noti = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+            int i=0;
+            if (j>0){
+                i=j;
+            }
+            notifications.getManager().notify(i, builder.build());
+
         }
-        notifications.getManager().notify(i, builder.build());
+
 
     }
 }

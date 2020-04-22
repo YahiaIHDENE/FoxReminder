@@ -1,6 +1,7 @@
 package m.incrementrestservice.poulouloureminder.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -8,19 +9,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import m.incrementrestservice.poulouloureminder.MessageActivity;
 import m.incrementrestservice.poulouloureminder.NotesActivity;
 import m.incrementrestservice.poulouloureminder.R;
 import m.incrementrestservice.poulouloureminder.model.Notes;
-import m.incrementrestservice.poulouloureminder.model.User;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
 
@@ -37,6 +43,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         public TextView Title;
         public CircleImageView noteIcon;
         public  TextView date;
+        public ImageView checkbox;
 
 
         public  ViewHolder(View itemView){
@@ -45,6 +52,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
             Title = itemView.findViewById(R.id.Title_note);
             noteIcon = itemView.findViewById(R.id.image_note_item);
             date= itemView.findViewById(R.id.date_note);
+            checkbox= itemView.findViewById(R.id.selectednote);
 
         }
     }
@@ -56,7 +64,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 
         final  Notes notes= mNotes.get(position);
         holder.Title.setText(notes.title);
@@ -76,6 +84,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
                 mContext.startActivity(intent);
             }
         });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                delete_notes( notes,holder);
+
+                return false;
+            }
+        });
     }
 
     @Override
@@ -83,6 +100,44 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         return mNotes.size();
     }
 
+    public  void delete_notes(final Notes notes, final NotesAdapter.ViewHolder holder){
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("notes").child(notes.id_note);
+        if (firebaseUser.getUid().equals(notes.owner)){
+            holder.checkbox.setVisibility(View.VISIBLE);
+            AlertDialog.Builder alerteDialog = new AlertDialog.Builder(mContext);
+            alerteDialog.setTitle("Delete the appointment!!");
+            alerteDialog.setIcon(R.drawable.ic_delete_note);
+            alerteDialog.setMessage("would you like to delete the appointment ?");
+            alerteDialog.setCancelable(false);
+            alerteDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
+                    mDatabase.removeValue();
+                    Toast.makeText(mContext, "appointment "+notes.title+" deleted .",Toast.LENGTH_LONG).show();
+
+                }
+            });
+            alerteDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    Toast.makeText(mContext, "Undo", Toast.LENGTH_LONG).show();
+                    holder.checkbox.setVisibility(View.INVISIBLE);
+
+
+
+                }
+            });
+
+            AlertDialog alertDialogfinal = alerteDialog.create();
+            alertDialogfinal.show();
+        }else {
+
+        }
+
+
+    }
 
 }

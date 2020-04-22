@@ -100,7 +100,9 @@ public class SendFragment extends Fragment {
                     User user = snapshot.getValue(User.class);
                     for (Chatlist chatlist : listUsers){
                         if (user.id_user.equals(chatlist.getId())){
-                            mUser.add(user);
+                            if (user.count_stat.equals("Yes")){
+                                mUser.add(user);
+                            }
 
                         }
                     }

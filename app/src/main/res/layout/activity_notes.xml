@@ -99,19 +99,20 @@
 
     <ImageButton
         android:id="@+id/editdate1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_below="@+id/Title_note2"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
         android:layout_toEndOf="@+id/date_note"
         android:layout_toRightOf="@+id/date_note"
-        android:src="@drawable/ic_calender" />
+        android:background="@drawable/ic_calender" />
 
     <EditText
         android:id="@+id/note"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:hint="Note ..."
+        android:hint= "Note ..."
         android:textColorHint="#000000"
         android:layout_below="@+id/date_note"
         android:layout_centerHorizontal="true"

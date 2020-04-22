@@ -136,7 +136,7 @@ public class profileFragment extends Fragment {
 
                                 if(!TextUtils.isEmpty(newUsername) && newUsername.length()>3){
 
-                                    User user = new User(userId,newUsername,firebaseUser.getEmail(),"default", "Offline", newUsername.toLowerCase());
+                                    User user = new User(userId,newUsername,firebaseUser.getEmail(),"default", "Offline", newUsername.toLowerCase(),"Yes");
                                     mDatabase.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {

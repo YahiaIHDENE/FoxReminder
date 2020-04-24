@@ -162,7 +162,8 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                         adress_rdv.setHint(rdvs.adress);
                         text.setText(rdvs.text);
                         text.setHint(rdvs.text);
-                    }else{
+                    }
+                    else{
 
                         titleRdv2.setVisibility(View.INVISIBLE);
                         date.setVisibility(View.INVISIBLE);
@@ -240,7 +241,6 @@ public class RdvActivity extends AppCompatActivity implements DialogueParticipan
                         public void onClick(View v) {
                             Toast.makeText(RdvActivity.this, "Maps lanching", Toast.LENGTH_LONG).show();
                             String adresse =  adress_Rdvclient.getText().toString().replaceAll("Address : "," ");
-                            System.out.println("//////////////////// "+adresse+" ///////////////////");
                             String uri = "http://maps.google.com/maps?daddr=" +adresse;
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
                             intent.setPackage("com.google.android.apps.maps");

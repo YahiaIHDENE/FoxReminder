@@ -45,14 +45,16 @@ import java.util.List;
 import m.incrementrestservice.poulouloureminder.adapter.PlaceAutoSuggestAdapter;
 import m.incrementrestservice.poulouloureminder.model.PlaceInfo;
 
-/**
- * Created by User on 10/2/2017.
- */
+
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     public String address;
+    MarkerOptions options = new MarkerOptions();
+    private Marker mMarker;
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
@@ -92,7 +94,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private PlaceInfo mPlace;
-    private Marker mMarker;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
 
@@ -106,16 +107,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mSearchText=findViewById(R.id.input_search);
         getAddess = findViewById(R.id.valideAddress);
         mSearchText.setAdapter(new PlaceAutoSuggestAdapter(MapActivity.this,android.R.layout.simple_list_item_1));
-
         getLocationPermission();
 
         getAddess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String data = mSearchText.getText().toString();
-                Intent intent = new Intent();
-                intent.putExtra("adresse", data);
-                setResult(RESULT_OK, intent);
+                if (!data.isEmpty()){
+                    Intent intent = new Intent();
+                    intent.putExtra("adresse", data);
+                    setResult(RESULT_OK, intent);
+                }else {
+                    Intent intent = new Intent();
+                    System.out.println("=============================="+address+"=================================");
+                    intent.putExtra("adresse",address );
+                    setResult(RESULT_OK, intent);
+                }
                 finish();
             }
         });
@@ -161,6 +168,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
 
                     //execute our method for searching
+                    mMarker.remove();
                     geoLocate();
                 }
 
@@ -172,6 +180,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: clicked gps icon");
+                mMarker.remove();
                 getDeviceLocation();
             }
         });
@@ -197,7 +206,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
                     address.getAddressLine(0));
 
@@ -220,10 +228,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
 
+                            List<Address> addresses = null;
+                            Geocoder geocoder;
+                            geocoder = new Geocoder(MapActivity.this);
+
+                            try {
+                                addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                            String city = addresses.get(0).getLocality();
+                            String state = addresses.get(0).getAdminArea();
+                            String country = addresses.get(0).getCountryName();
+                            String postalCode = addresses.get(0).getPostalCode();
+                            String knownName = addresses.get(0).getFeatureName();
+
                             if(currentLocation!=null){
                                 moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                         DEFAULT_ZOOM,
-                                        "My Location");
+                                        address+", "+city+", "+ state+", "+ postalCode+", "+ country);
                             }else {
                                 Toast.makeText(MapActivity.this, "Please turn on your Location", Toast.LENGTH_LONG).show();
                             }
@@ -240,46 +265,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        mMap.clear();
-
-        if(placeInfo != null){
-            try{
-                String snippet = "Address: " + placeInfo.getAddress() + "\n" +
-                        "Phone Number: " + placeInfo.getPhoneNumber() + "\n" +
-                        "Website: " + placeInfo.getWebsiteUri() + "\n" +
-                        "Price Rating: " + placeInfo.getRating() + "\n";
-
-                MarkerOptions options = new MarkerOptions()
-                        .position(latLng)
-                        .title(placeInfo.getName())
-                        .snippet(snippet);
-                mMarker = mMap.addMarker(options);
-
-            }catch (NullPointerException e){
-                Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage() );
-            }
-        }else{
-            mMap.addMarker(new MarkerOptions().position(latLng));
-        }
-
-        hideSoftKeyboard();
-    }
     private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
         if(!title.equals("My Location")){
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
+            options.position(latLng)
                     .title(title);
-            mMap.addMarker(options);
+            mMarker =mMap.addMarker(options);
         }
+        mSearchText.setText("");
 
         hideSoftKeyboard();
+        address = title;
     }
 
     private void initMap(){
@@ -387,6 +386,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //========================================================================//
 
 
+/*
+    private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo){
+        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
+        mMap.clear();
+
+        if(placeInfo != null){
+            try{
+                String snippet = "Address: " + placeInfo.getAddress() + "\n" +
+                        "Phone Number: " + placeInfo.getPhoneNumber() + "\n" +
+                        "Website: " + placeInfo.getWebsiteUri() + "\n" +
+                        "Price Rating: " + placeInfo.getRating() + "\n";
+
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title(placeInfo.getName())
+                        .snippet(snippet);
+                mMarker = mMap.addMarker(options);
+
+            }catch (NullPointerException e){
+                Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage() );
+            }
+        }else{
+            mMap.addMarker(new MarkerOptions().position(latLng));
+        }
+
+        hideSoftKeyboard();
+    }
+ */
 
 }

@@ -10,9 +10,9 @@
     <string name="menu_home">Home</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_notes">Notes</string>
-    <string name="menu_chat">Chat</string>
+    <string name="menu_chat">Users</string>
     <string name="menu_share">Share</string>
-    <string name="menu_send">Send</string>
+    <string name="menu_send">Chat</string>
     <string name="menu_exit">Exit</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>

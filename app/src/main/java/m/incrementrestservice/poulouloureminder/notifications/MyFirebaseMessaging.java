@@ -90,13 +90,11 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         String icon = remoteMessage.getData().get("icon");
         String body = remoteMessage.getData().get("body");
         String title = remoteMessage.getData().get("title");
-        System.out.println("++++++++++++++++++++++++++++"+title+"+++++++++++++++++++++++");
         if (title.equals(" New message")){
 
             String user = remoteMessage.getData().get("user");
 
             RemoteMessage.Notification notification = remoteMessage.getNotification();
-            System.out.println("11111111111111111111111111111111111111111111111111111111111111111111111111111");
             int j = Integer.parseInt(user.replaceAll("[\\D]",""));
             Intent intent = new Intent(this, MessageActivity.class);
             Bundle bundle =new Bundle();
@@ -116,12 +114,9 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
             notifications.getManager().notify(i, builder.build());
 
         }else {
-            System.out.println("222222222222222222222222222222222222222222222222222222222222222222222222222222222222");
             String allString = remoteMessage.getData().get("user");
             String user = allString.substring(allString.indexOf("=")+1,allString.indexOf("+"));
             String idrvd = allString.substring(allString.indexOf("+")+1,allString.indexOf("#"));
-            System.out.println("///////////////////////|"+user+"|///////////////////////");
-            System.out.println("///////////////////////|"+idrvd+"|///////////////////////");
 
             int j = Integer.parseInt(user.replaceAll("[\\D]",""));
             Intent intent = new Intent(this, RdvActivity.class);

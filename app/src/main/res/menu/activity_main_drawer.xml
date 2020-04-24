@@ -27,7 +27,7 @@
         <menu>
             <item
                 android:id="@+id/nav_chat"
-                android:icon="@drawable/ic_chat_24dp"
+                android:icon="@drawable/ic_added"
                 android:title="@string/menu_chat" />
 
             <item

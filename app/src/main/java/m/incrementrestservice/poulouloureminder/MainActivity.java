@@ -32,7 +32,6 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 import m.incrementrestservice.poulouloureminder.ui.HomeFragment;
 import m.incrementrestservice.poulouloureminder.ui.SendFragment;
-import m.incrementrestservice.poulouloureminder.ui.ShareFragment;
 import m.incrementrestservice.poulouloureminder.ui.chatFragment;
 import m.incrementrestservice.poulouloureminder.ui.notesFragment;
 import m.incrementrestservice.poulouloureminder.ui.profileFragment;
@@ -194,7 +193,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.nav_share:
-                getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment,new ShareFragment()).commit();
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("Text/Plain");
+                String titleTxt = "Pouloulou Reminder";
+                String body =  "https://github.com/YahiaIHDENE/FoxReminder/application/pouloulou_reminder.apk";
+                intent.putExtra(Intent.EXTRA_SUBJECT,body);
+                intent.putExtra(Intent.EXTRA_TEXT,titleTxt);
+                startActivity(Intent.createChooser(intent, "Shar "));
+                //getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment,new ShareFragment()).commit();
                 toolbar.setTitle("Share");
                 break;
 

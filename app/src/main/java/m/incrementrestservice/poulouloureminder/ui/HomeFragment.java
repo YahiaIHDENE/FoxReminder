@@ -61,13 +61,6 @@ public class HomeFragment extends Fragment {
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                String allString = "=1ghdkthxklghxclgcxggc0+2gclljvljyhvljhvlhk0#";
-                String user = allString.substring(allString.indexOf("="),allString.indexOf("+")-1);
-                String idrvd = allString.substring(allString.indexOf("+"),allString.indexOf("#")-1);
-                System.out.println("++++++++++++++++++++++++++++"+user+"+++++++++++++++++++++++");
-                System.out.println("++++++++++++++++++++++++++++"+idrvd+"+++++++++++++++++++++++");
-
                 startActivity(new Intent(getActivity(), NewRdvActivity.class));
 
 

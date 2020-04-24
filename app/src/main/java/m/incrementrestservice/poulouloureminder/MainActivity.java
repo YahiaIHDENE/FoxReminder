@@ -196,12 +196,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("Text/Plain");
                 String titleTxt = "Pouloulou Reminder";
-                String body =  "https://github.com/YahiaIHDENE/FoxReminder/application/pouloulou_reminder.apk";
-                intent.putExtra(Intent.EXTRA_SUBJECT,body);
-                intent.putExtra(Intent.EXTRA_TEXT,titleTxt);
+                String body =  "https://github.com/YahiaIHDENE/FoxReminder/raw/master/application/pouloulou_reminder.apk";
+                intent.putExtra(Intent.EXTRA_SUBJECT,titleTxt);
+                intent.putExtra(Intent.EXTRA_TEXT,body);
                 startActivity(Intent.createChooser(intent, "Shar "));
-                //getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment,new ShareFragment()).commit();
-                toolbar.setTitle("Share");
+
                 break;
 
             case R.id.nav_exit:

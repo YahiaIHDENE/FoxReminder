@@ -2,7 +2,9 @@ package m.incrementrestservice.poulouloureminder;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -38,6 +40,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +103,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences googleBug = getSharedPreferences("google_bug", Context.MODE_PRIVATE);
+        if (!googleBug.contains("fixed")) {
+            File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
+            corruptedZoomTables.delete();
+            googleBug.edit().putBoolean("fixed", true).apply();
+        }
+
         setContentView(R.layout.activity_map);
         //mSearchText =  findViewById(R.id.input_search);
         mGps = findViewById(R.id.ic_gps);
@@ -119,7 +129,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     setResult(RESULT_OK, intent);
                 }else {
                     Intent intent = new Intent();
-                    System.out.println("=============================="+address+"=================================");
                     intent.putExtra("adresse",address );
                     setResult(RESULT_OK, intent);
                 }
